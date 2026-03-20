@@ -347,7 +347,7 @@
     <div id="start-screen">
       <div class="emoji-row">&#x1F9EE; &#x2716;&#xFE0F; &#x2797; &#x1F9E0;</div>
       <h1>Flash Tables</h1>
-      <p class="subtitle">Multiplication &amp; Division!<br/>How many can you get right?<br/>You have 20 seconds per question.<br/>3 strikes and you're out!</p>
+      <p class="subtitle">Multiplication &amp; Division!<br/>How many can you get right?<br/>You have 10 seconds per question.<br/>3 strikes and you're out!</p>
       <br/>
       <button id="start-btn">Start!</button>
       <div id="home-leaderboard" class="leaderboard-section"></div>
@@ -357,7 +357,7 @@
     <div id="game-screen" class="hidden">
       <div class="stats-bar">
         <span class="score" id="score-display">Score: 0</span>
-        <span id="timer-display">&#x23F1; 20s</span>
+        <span id="timer-display">&#x23F1; 10s</span>
         <span class="strikes" id="strikes-display">&#x274C; 0 / 3</span>
       </div>
       <div class="timer-bar-track">
@@ -438,7 +438,7 @@
     let timeLeft = 20;
     let celebrationTimeout = null;
 
-    const TIME_LIMIT = 20;
+    const TIME_LIMIT = 10;
     const MAX_STRIKES = 3;
     const POINTS_PER_CORRECT = 10;
     const LEADERBOARD_KEY = "flashTablesLeaderboard";
