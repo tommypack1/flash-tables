@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Multiplication Flashcards!</title>
+  <title>Math Flashcards!</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -15,6 +15,10 @@
       justify-content: center;
       background: linear-gradient(135deg, #2196F3 0%, #1abc9c 100%);
       color: #333;
+      transition: background 0.5s ease;
+    }
+    body.division-mode {
+      background: linear-gradient(135deg, #27ae60 0%, #f1c40f 100%);
     }
 
     .container {
@@ -181,9 +185,9 @@
 
     <!-- ===== START SCREEN ===== -->
     <div id="start-screen">
-      <div class="emoji-row">🧮 ✖️ 🧠</div>
-      <h1>Multiplication Flashcards</h1>
-      <p class="subtitle">How many can you get right?<br/>You have 20 seconds per question.<br/>3 strikes and you're out!</p>
+      <div class="emoji-row">🧮 ✖️ ➗ 🧠</div>
+      <h1>Math Flashcards</h1>
+      <p class="subtitle">Multiplication &amp; Division!<br/>How many can you get right?<br/>You have 20 seconds per question.<br/>3 strikes and you're out!</p>
       <br/>
       <button id="start-btn">Start!</button>
     </div>
@@ -242,6 +246,8 @@
     let totalAnswered = 0;
     let currentA = 0;
     let currentB = 0;
+    let currentOp = "×"; // "×" or "÷"
+    let currentAnswer = 0;
     let timerInterval = null;
     let timeLeft = 20;
 
@@ -249,12 +255,20 @@
     const MAX_STRIKES = 3;
     const POINTS_PER_CORRECT = 10;
 
-    // --- Build question pool (1×1 through 12×12) ---
+    // --- Build question pool (multiplication + division) ---
     function buildPool() {
       const pool = [];
+      // Multiplication: 1×1 through 12×12
       for (let a = 1; a <= 12; a++) {
         for (let b = 1; b <= 12; b++) {
-          pool.push([a, b]);
+          pool.push({ a: a, b: b, op: "×", answer: a * b });
+        }
+      }
+      // Division: only whole-number results, dividend 1-12, divisor 1-12
+      for (let divisor = 1; divisor <= 12; divisor++) {
+        for (let quotient = 1; quotient <= 12; quotient++) {
+          const dividend = divisor * quotient;
+          pool.push({ a: dividend, b: divisor, op: "÷", answer: quotient });
         }
       }
       // Shuffle
@@ -304,12 +318,22 @@
     // --- Next Question ---
     function nextQuestion() {
       if (poolIndex >= pool.length) {
-        // Reshuffle if we somehow go through all 144
+        // Reshuffle if we go through all problems
         pool = buildPool();
         poolIndex = 0;
       }
-      [currentA, currentB] = pool[poolIndex++];
-      questionEl.textContent = currentA + " × " + currentB;
+      const problem = pool[poolIndex++];
+      currentA = problem.a;
+      currentB = problem.b;
+      currentOp = problem.op;
+      currentAnswer = problem.answer;
+      questionEl.textContent = currentA + " " + currentOp + " " + currentB;
+      // Switch background for division problems
+      if (currentOp === "÷") {
+        document.body.classList.add("division-mode");
+      } else {
+        document.body.classList.remove("division-mode");
+      }
       answerInput.value = "";
       feedbackEl.textContent = "";
       feedbackEl.className = "feedback";
@@ -322,8 +346,7 @@
       const val = answerInput.value.trim();
       if (val === "") return;
       const answer = parseInt(val, 10);
-      const correct = currentA * currentB;
-      if (answer === correct) {
+      if (answer === currentAnswer) {
         handleCorrect();
       } else {
         handleWrong(false);
@@ -347,12 +370,11 @@
       clearInterval(timerInterval);
       strikes++;
       totalAnswered++;
-      const correct = currentA * currentB;
       strikesDisplay.textContent = "❌ " + strikes + " / " + MAX_STRIKES;
       if (wasTimeout) {
-        feedbackEl.textContent = "⏰ Time's up! " + currentA + " × " + currentB + " = " + correct;
+        feedbackEl.textContent = "⏰ Time's up! " + currentA + " " + currentOp + " " + currentB + " = " + currentAnswer;
       } else {
-        feedbackEl.textContent = "❌ Nope! " + currentA + " × " + currentB + " = " + correct;
+        feedbackEl.textContent = "❌ Nope! " + currentA + " " + currentOp + " " + currentB + " = " + currentAnswer;
       }
       feedbackEl.className = "feedback wrong";
       answerInput.classList.add("shake");
@@ -367,6 +389,7 @@
 
     // --- Results ---
     function showResults() {
+      document.body.classList.remove("division-mode");
       showScreen(resultScreen);
       finalScoreEl.textContent = score;
       let msg = "You got " + correctCount + " out of " + totalAnswered + " correct.";
