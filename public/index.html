@@ -16,6 +16,7 @@
       background: linear-gradient(135deg, #2196F3 0%, #1abc9c 100%);
       color: #333;
       transition: background 0.5s ease;
+      overflow: hidden;
     }
     body.division-mode {
       background: linear-gradient(135deg, #27ae60 0%, #f1c40f 100%);
@@ -29,6 +30,8 @@
       max-width: 95vw;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       text-align: center;
+      position: relative;
+      z-index: 10;
     }
 
     h1 {
@@ -148,7 +151,7 @@
       line-height: 1.6;
     }
 
-    #play-again-btn {
+    #play-again-btn, #back-to-menu-btn {
       background: linear-gradient(135deg, #2196F3, #1abc9c);
       color: white;
       border: none;
@@ -159,7 +162,81 @@
       transition: transform 0.15s;
       box-shadow: 0 4px 15px rgba(26,188,156,0.4);
     }
-    #play-again-btn:hover { transform: scale(1.05); }
+    #play-again-btn:hover, #back-to-menu-btn:hover { transform: scale(1.05); }
+
+    /* ---------- NAME ENTRY SCREEN ---------- */
+    #name-input {
+      width: 240px;
+      text-align: center;
+      font-size: 1.4rem;
+      padding: 12px;
+      border: 3px solid #ddd;
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 16px;
+    }
+    #name-input:focus { border-color: #1abc9c; }
+
+    #save-score-btn {
+      background: linear-gradient(135deg, #f39c12, #e74c3c);
+      color: white;
+      border: none;
+      padding: 14px 40px;
+      font-size: 1.15rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.15s;
+      box-shadow: 0 4px 15px rgba(231,76,60,0.4);
+    }
+    #save-score-btn:hover { transform: scale(1.05); }
+
+    /* ---------- LEADERBOARD ---------- */
+    .leaderboard-section {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .leaderboard-section h2 {
+      text-align: center;
+      font-size: 1.3rem;
+      color: #e67e22;
+      margin-bottom: 12px;
+    }
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    .leaderboard-table th {
+      background: linear-gradient(135deg, #f39c12, #e67e22);
+      color: white;
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .leaderboard-table th:first-child { border-radius: 8px 0 0 0; }
+    .leaderboard-table th:last-child  { border-radius: 0 8px 0 0; }
+    .leaderboard-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .leaderboard-table tr:last-child td { border-bottom: none; }
+    .leaderboard-table tr:nth-child(even) { background: #fafafa; }
+    .leaderboard-table .rank-1 td { background: #fff8e1; font-weight: 700; }
+    .leaderboard-table .rank-2 td { background: #f5f5f5; }
+    .leaderboard-table .rank-3 td { background: #fff3e0; }
+    .leaderboard-table .highlight td {
+      background: #e8f5e9;
+      font-weight: 700;
+      color: #2e7d32;
+    }
+    .leaderboard-empty {
+      text-align: center;
+      color: #aaa;
+      padding: 20px;
+      font-style: italic;
+    }
+    .rank-medal { margin-right: 4px; }
 
     .hidden { display: none !important; }
 
@@ -178,6 +255,89 @@
       100% { transform: scale(1); }
     }
     .pop { animation: pop 0.3s ease; }
+
+    /* ---------- CELEBRATION OVERLAY ---------- */
+    #celebration-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1000;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* Firework particles */
+    .firework {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      animation: firework-burst 1.2s ease-out forwards;
+    }
+    @keyframes firework-burst {
+      0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3); }
+    }
+
+    /* Laser beams */
+    .laser {
+      position: absolute;
+      height: 3px;
+      transform-origin: left center;
+      animation: laser-sweep 2s ease-in-out infinite alternate;
+      filter: blur(1px);
+      box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+    }
+    @keyframes laser-sweep {
+      0%   { transform: rotate(var(--from-angle)); opacity: 0.8; }
+      50%  { opacity: 1; }
+      100% { transform: rotate(var(--to-angle)); opacity: 0.8; }
+    }
+
+    /* Celebration creatures */
+    .creature {
+      position: absolute;
+      font-size: 4rem;
+      animation: creature-fly 4s ease-in-out infinite;
+      filter: drop-shadow(0 0 15px rgba(255,255,255,0.5));
+    }
+    @keyframes creature-fly {
+      0%   { transform: translate(0, 0) scaleX(var(--dir)); }
+      25%  { transform: translate(calc(var(--mx) * 1px), -40px) scaleX(var(--dir)); }
+      50%  { transform: translate(calc(var(--mx) * 2px), 10px) scaleX(var(--dir)); }
+      75%  { transform: translate(calc(var(--mx) * 3px), -30px) scaleX(var(--dir)); }
+      100% { transform: translate(calc(var(--mx) * 4px), 0) scaleX(var(--dir)); }
+    }
+
+    /* New #1 banner */
+    .new-champion-banner {
+      position: fixed;
+      top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1001;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 20px #ff0, 0 0 40px #f90, 0 0 60px #f00;
+      text-align: center;
+      animation: banner-pulse 1s ease-in-out infinite alternate;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    @keyframes banner-pulse {
+      0%   { transform: translateX(-50%) scale(1); text-shadow: 0 0 20px #ff0, 0 0 40px #f90; }
+      100% { transform: translateX(-50%) scale(1.1); text-shadow: 0 0 30px #ff0, 0 0 60px #f90, 0 0 80px #f00; }
+    }
+
+    /* Scrollable leaderboard */
+    .leaderboard-scroll {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+    .leaderboard-scroll::-webkit-scrollbar { width: 6px; }
+    .leaderboard-scroll::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
   </style>
 </head>
 <body>
@@ -185,24 +345,25 @@
 
     <!-- ===== START SCREEN ===== -->
     <div id="start-screen">
-      <div class="emoji-row">🧮 ✖️ ➗ 🧠</div>
+      <div class="emoji-row">&#x1F9EE; &#x2716;&#xFE0F; &#x2797; &#x1F9E0;</div>
       <h1>Flash Tables</h1>
       <p class="subtitle">Multiplication &amp; Division!<br/>How many can you get right?<br/>You have 20 seconds per question.<br/>3 strikes and you're out!</p>
       <br/>
       <button id="start-btn">Start!</button>
+      <div id="home-leaderboard" class="leaderboard-section"></div>
     </div>
 
     <!-- ===== GAME SCREEN ===== -->
     <div id="game-screen" class="hidden">
       <div class="stats-bar">
         <span class="score" id="score-display">Score: 0</span>
-        <span id="timer-display">⏱ 20s</span>
-        <span class="strikes" id="strikes-display">❌ 0 / 3</span>
+        <span id="timer-display">&#x23F1; 20s</span>
+        <span class="strikes" id="strikes-display">&#x274C; 0 / 3</span>
       </div>
       <div class="timer-bar-track">
         <div class="timer-bar-fill" id="timer-bar" style="width:100%; background:#27ae60;"></div>
       </div>
-      <div class="question" id="question">? × ?</div>
+      <div class="question" id="question">? &#xD7; ?</div>
       <div class="input-row">
         <input type="number" id="answer-input" autofocus placeholder="?" />
         <button id="submit-btn">Go!</button>
@@ -210,16 +371,33 @@
       <div class="feedback" id="feedback"></div>
     </div>
 
-    <!-- ===== RESULT SCREEN ===== -->
+    <!-- ===== RESULT / NAME ENTRY SCREEN ===== -->
     <div id="result-screen" class="hidden">
       <h1>Game Over!</h1>
       <div class="final-score" id="final-score">0</div>
       <p class="subtitle">points</p>
       <div class="result-detail" id="result-detail"></div>
-      <button id="play-again-btn">Play Again</button>
+
+      <!-- Name entry -->
+      <div id="name-entry">
+        <p style="color: #666; margin-bottom: 12px; font-weight: 600;">Enter your name for the leaderboard:</p>
+        <input type="text" id="name-input" maxlength="20" placeholder="Your name" /><br/>
+        <button id="save-score-btn">Save Score</button>
+      </div>
+
+      <!-- Leaderboard (shown after saving) -->
+      <div id="result-leaderboard" class="leaderboard-section hidden"></div>
+
+      <div id="result-buttons" class="hidden" style="margin-top: 16px; display: flex; gap: 12px; justify-content: center;">
+        <button id="play-again-btn">Play Again</button>
+        <button id="back-to-menu-btn">Menu</button>
+      </div>
     </div>
 
   </div>
+
+  <!-- Celebration overlay (fireworks, lasers, creatures) -->
+  <div id="celebration-overlay" class="hidden"></div>
 
   <script>
     // --- Elements ---
@@ -229,6 +407,7 @@
     const startBtn     = document.getElementById("start-btn");
     const submitBtn    = document.getElementById("submit-btn");
     const playAgainBtn = document.getElementById("play-again-btn");
+    const backToMenuBtn = document.getElementById("back-to-menu-btn");
     const answerInput  = document.getElementById("answer-input");
     const questionEl   = document.getElementById("question");
     const feedbackEl   = document.getElementById("feedback");
@@ -238,6 +417,13 @@
     const timerBar     = document.getElementById("timer-bar");
     const finalScoreEl = document.getElementById("final-score");
     const resultDetail = document.getElementById("result-detail");
+    const nameInput    = document.getElementById("name-input");
+    const saveScoreBtn = document.getElementById("save-score-btn");
+    const nameEntry    = document.getElementById("name-entry");
+    const resultLeaderboard = document.getElementById("result-leaderboard");
+    const resultButtons = document.getElementById("result-buttons");
+    const homeLeaderboard = document.getElementById("home-leaderboard");
+    const celebrationOverlay = document.getElementById("celebration-overlay");
 
     // --- Game State ---
     let score = 0;
@@ -246,32 +432,208 @@
     let totalAnswered = 0;
     let currentA = 0;
     let currentB = 0;
-    let currentOp = "×"; // "×" or "÷"
+    let currentOp = "\u00D7"; // "x" or "÷"
     let currentAnswer = 0;
     let timerInterval = null;
     let timeLeft = 20;
+    let celebrationTimeout = null;
 
     const TIME_LIMIT = 20;
     const MAX_STRIKES = 3;
     const POINTS_PER_CORRECT = 10;
+    const LEADERBOARD_KEY = "flashTablesLeaderboard";
+    const MAX_LEADERBOARD_ENTRIES = 50;
+
+    // ===================== LEADERBOARD =====================
+    function getLeaderboard() {
+      try {
+        const data = JSON.parse(localStorage.getItem(LEADERBOARD_KEY));
+        if (Array.isArray(data)) return data;
+      } catch(e) {}
+      return [];
+    }
+
+    function saveLeaderboard(board) {
+      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(board));
+    }
+
+    function addScore(name, points, correct, total) {
+      const board = getLeaderboard();
+      const entry = {
+        name: name.trim().substring(0, 20),
+        score: points,
+        correct: correct,
+        total: total,
+        date: new Date().toLocaleDateString()
+      };
+      board.push(entry);
+      board.sort((a, b) => b.score - a.score || a.date.localeCompare(b.date));
+      if (board.length > MAX_LEADERBOARD_ENTRIES) board.length = MAX_LEADERBOARD_ENTRIES;
+      saveLeaderboard(board);
+      // Return the rank (1-based index)
+      return board.indexOf(entry) + 1;
+    }
+
+    function renderLeaderboard(container, highlightIndex) {
+      const board = getLeaderboard();
+      if (board.length === 0) {
+        container.innerHTML = '<div class="leaderboard-section"><h2>&#x1F3C6; Leaderboard</h2><p class="leaderboard-empty">No scores yet. Be the first!</p></div>';
+        return;
+      }
+      const top10 = board.slice(0, 10);
+      let html = '<h2>&#x1F3C6; Leaderboard</h2><div class="leaderboard-scroll"><table class="leaderboard-table"><tr><th>#</th><th>Name</th><th>Score</th><th>Date</th></tr>';
+      top10.forEach((entry, i) => {
+        const rank = i + 1;
+        let cls = '';
+        if (highlightIndex !== undefined && highlightIndex === i) cls = 'highlight';
+        else if (rank === 1) cls = 'rank-1';
+        else if (rank === 2) cls = 'rank-2';
+        else if (rank === 3) cls = 'rank-3';
+
+        let medal = '';
+        if (rank === 1) medal = '<span class="rank-medal">&#x1F947;</span>';
+        else if (rank === 2) medal = '<span class="rank-medal">&#x1F948;</span>';
+        else if (rank === 3) medal = '<span class="rank-medal">&#x1F949;</span>';
+
+        html += '<tr class="' + cls + '"><td>' + medal + rank + '</td><td>' + escapeHtml(entry.name) + '</td><td>' + entry.score + '</td><td>' + entry.date + '</td></tr>';
+      });
+      html += '</table></div>';
+      container.innerHTML = '<div class="leaderboard-section">' + html + '</div>';
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ===================== CELEBRATION =====================
+    function launchCelebration() {
+      celebrationOverlay.classList.remove("hidden");
+      celebrationOverlay.innerHTML = '';
+
+      // Banner
+      const banner = document.createElement('div');
+      banner.className = 'new-champion-banner';
+      banner.innerHTML = '&#x1F451; NEW #1 CHAMPION! &#x1F451;<br/>&#x1F525; YOU ARE THE BEST! &#x1F525;';
+      celebrationOverlay.appendChild(banner);
+
+      // Launch fireworks in waves
+      for (let wave = 0; wave < 6; wave++) {
+        setTimeout(() => launchFireworkBurst(), wave * 800);
+      }
+
+      // Lasers
+      createLaserShow();
+
+      // Dinosaurs and dragons
+      createCreatures();
+
+      // Auto-dismiss after 8 seconds
+      celebrationTimeout = setTimeout(stopCelebration, 8000);
+    }
+
+    function launchFireworkBurst() {
+      const colors = ['#ff0040', '#ff8c00', '#ffee00', '#00ff88', '#00aaff', '#aa00ff', '#ff00aa', '#fff'];
+      const cx = Math.random() * window.innerWidth;
+      const cy = Math.random() * window.innerHeight * 0.5 + 50;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const particleCount = 30 + Math.floor(Math.random() * 20);
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'firework';
+        const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.3;
+        const dist = 80 + Math.random() * 120;
+        const dx = Math.cos(angle) * dist;
+        const dy = Math.sin(angle) * dist;
+        particle.style.cssText = 'left:' + cx + 'px;top:' + cy + 'px;background:' + color +
+          ';--dx:' + dx + 'px;--dy:' + dy + 'px;animation-delay:' + (Math.random() * 0.2) + 's;' +
+          'box-shadow:0 0 6px ' + color + ';';
+        celebrationOverlay.appendChild(particle);
+        setTimeout(() => particle.remove(), 1500);
+      }
+    }
+
+    function createLaserShow() {
+      const laserColors = ['#ff0000', '#00ff00', '#0088ff', '#ff00ff', '#ffff00', '#00ffff'];
+      for (let i = 0; i < 12; i++) {
+        const laser = document.createElement('div');
+        laser.className = 'laser';
+        const color = laserColors[i % laserColors.length];
+        const fromAngle = -30 + Math.random() * 60;
+        const toAngle = -30 + Math.random() * 60;
+        const startX = Math.random() * window.innerWidth;
+        const startY = window.innerHeight;
+        const width = 200 + Math.random() * 400;
+        laser.style.cssText = 'left:' + startX + 'px;top:' + startY + 'px;width:' + width +
+          'px;background:linear-gradient(90deg,' + color + ',' + color + '00);color:' + color +
+          ';--from-angle:' + fromAngle + 'deg;--to-angle:' + toAngle + 'deg;animation-delay:' + (Math.random() * 1) + 's;' +
+          'animation-duration:' + (1.5 + Math.random() * 2) + 's;';
+        celebrationOverlay.appendChild(laser);
+      }
+      // Top lasers pointing down
+      for (let i = 0; i < 8; i++) {
+        const laser = document.createElement('div');
+        laser.className = 'laser';
+        const color = laserColors[i % laserColors.length];
+        const fromAngle = 150 + Math.random() * 60;
+        const toAngle = 150 + Math.random() * 60;
+        const startX = Math.random() * window.innerWidth;
+        laser.style.cssText = 'left:' + startX + 'px;top:0px;width:' + (300 + Math.random() * 300) +
+          'px;background:linear-gradient(90deg,' + color + ',' + color + '00);color:' + color +
+          ';--from-angle:' + fromAngle + 'deg;--to-angle:' + toAngle + 'deg;animation-delay:' + (Math.random() * 1.5) + 's;' +
+          'animation-duration:' + (1.5 + Math.random() * 2) + 's;';
+        celebrationOverlay.appendChild(laser);
+      }
+    }
+
+    function createCreatures() {
+      const creatures = [
+        { emoji: '&#x1F996;', label: 'T-Rex' },      // T-Rex
+        { emoji: '&#x1F995;', label: 'Sauropod' },    // Sauropod
+        { emoji: '&#x1F409;', label: 'Dragon' },      // Dragon
+        { emoji: '&#x1F432;', label: 'Dragon Face' }, // Dragon face
+        { emoji: '&#x1F996;', label: 'T-Rex 2' },
+        { emoji: '&#x1F409;', label: 'Dragon 2' },
+      ];
+
+      creatures.forEach((c, i) => {
+        const el = document.createElement('div');
+        el.className = 'creature';
+        el.innerHTML = c.emoji;
+        const side = i % 2 === 0 ? 'left' : 'right';
+        const startX = side === 'left' ? -80 : window.innerWidth + 20;
+        const startY = 100 + Math.random() * (window.innerHeight - 300);
+        const dir = side === 'left' ? 1 : -1;
+        const mx = dir * (15 + Math.random() * 25);
+        el.style.cssText = 'left:' + startX + 'px;top:' + startY + 'px;--dir:' + dir +
+          ';--mx:' + mx + ';animation-delay:' + (i * 0.5) + 's;animation-duration:' + (3 + Math.random() * 3) + 's;';
+        celebrationOverlay.appendChild(el);
+      });
+    }
+
+    function stopCelebration() {
+      if (celebrationTimeout) clearTimeout(celebrationTimeout);
+      celebrationTimeout = null;
+      celebrationOverlay.classList.add("hidden");
+      celebrationOverlay.innerHTML = '';
+    }
 
     // --- Build question pool (multiplication + division) ---
     function buildPool() {
       const pool = [];
-      // Multiplication: 1×1 through 12×12
       for (let a = 1; a <= 12; a++) {
         for (let b = 1; b <= 12; b++) {
-          pool.push({ a: a, b: b, op: "×", answer: a * b });
+          pool.push({ a: a, b: b, op: "\u00D7", answer: a * b });
         }
       }
-      // Division: only whole-number results, dividend 1-12, divisor 1-12
       for (let divisor = 1; divisor <= 12; divisor++) {
         for (let quotient = 1; quotient <= 12; quotient++) {
           const dividend = divisor * quotient;
-          pool.push({ a: dividend, b: divisor, op: "÷", answer: quotient });
+          pool.push({ a: dividend, b: divisor, op: "\u00F7", answer: quotient });
         }
       }
-      // Shuffle
       for (let i = pool.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -307,7 +669,7 @@
 
     function updateTimerUI() {
       const secs = Math.max(0, Math.ceil(timeLeft));
-      timerDisplay.textContent = "⏱ " + secs + "s";
+      timerDisplay.textContent = "\u23F1 " + secs + "s";
       const pct = Math.max(0, (timeLeft / TIME_LIMIT) * 100);
       timerBar.style.width = pct + "%";
       if (pct > 50)      timerBar.style.background = "#27ae60";
@@ -318,7 +680,6 @@
     // --- Next Question ---
     function nextQuestion() {
       if (poolIndex >= pool.length) {
-        // Reshuffle if we go through all problems
         pool = buildPool();
         poolIndex = 0;
       }
@@ -328,8 +689,7 @@
       currentOp = problem.op;
       currentAnswer = problem.answer;
       questionEl.textContent = currentA + " " + currentOp + " " + currentB;
-      // Switch background for division problems
-      if (currentOp === "÷") {
+      if (currentOp === "\u00F7") {
         document.body.classList.add("division-mode");
       } else {
         document.body.classList.remove("division-mode");
@@ -359,7 +719,7 @@
       correctCount++;
       totalAnswered++;
       scoreDisplay.textContent = "Score: " + score;
-      feedbackEl.textContent = "✅ Correct!";
+      feedbackEl.textContent = "\u2705 Correct!";
       feedbackEl.className = "feedback correct";
       questionEl.classList.add("pop");
       setTimeout(() => questionEl.classList.remove("pop"), 300);
@@ -370,11 +730,11 @@
       clearInterval(timerInterval);
       strikes++;
       totalAnswered++;
-      strikesDisplay.textContent = "❌ " + strikes + " / " + MAX_STRIKES;
+      strikesDisplay.textContent = "\u274C " + strikes + " / " + MAX_STRIKES;
       if (wasTimeout) {
-        feedbackEl.textContent = "⏰ Time's up! " + currentA + " " + currentOp + " " + currentB + " = " + currentAnswer;
+        feedbackEl.textContent = "\u23F0 Time's up! " + currentA + " " + currentOp + " " + currentB + " = " + currentAnswer;
       } else {
-        feedbackEl.textContent = "❌ Nope! " + currentA + " " + currentOp + " " + currentB + " = " + currentAnswer;
+        feedbackEl.textContent = "\u274C Nope! " + currentA + " " + currentOp + " " + currentB + " = " + currentAnswer;
       }
       feedbackEl.className = "feedback wrong";
       answerInput.classList.add("shake");
@@ -393,15 +753,50 @@
       showScreen(resultScreen);
       finalScoreEl.textContent = score;
       let msg = "You got " + correctCount + " out of " + totalAnswered + " correct.";
-      if (correctCount >= 20)      msg += "\n🏆 Incredible! You're a math superstar!";
-      else if (correctCount >= 10) msg += "\n🌟 Great job! Keep it up!";
-      else if (correctCount >= 5)  msg += "\n💪 Nice effort! Practice makes perfect!";
-      else                         msg += "\n👍 Good try! You'll do even better next time!";
+      if (correctCount >= 20)      msg += "\n\u{1F3C6} Incredible! You're a math superstar!";
+      else if (correctCount >= 10) msg += "\n\u{1F31F} Great job! Keep it up!";
+      else if (correctCount >= 5)  msg += "\n\u{1F4AA} Nice effort! Practice makes perfect!";
+      else                         msg += "\n\u{1F44D} Good try! You'll do even better next time!";
       resultDetail.textContent = msg;
+
+      // Show name entry, hide leaderboard and buttons
+      nameEntry.classList.remove("hidden");
+      resultLeaderboard.classList.add("hidden");
+      resultButtons.classList.add("hidden");
+      resultButtons.style.display = "none";
+      nameInput.value = "";
+      nameInput.focus();
+    }
+
+    // --- Save Score ---
+    function handleSaveScore() {
+      const name = nameInput.value.trim();
+      if (!name) {
+        nameInput.style.borderColor = "#e74c3c";
+        nameInput.classList.add("shake");
+        setTimeout(() => { nameInput.classList.remove("shake"); nameInput.style.borderColor = "#ddd"; }, 400);
+        return;
+      }
+
+      const rank = addScore(name, score, correctCount, totalAnswered);
+
+      // Hide name entry, show leaderboard
+      nameEntry.classList.add("hidden");
+      resultLeaderboard.classList.remove("hidden");
+      resultButtons.classList.remove("hidden");
+      resultButtons.style.display = "flex";
+
+      renderLeaderboard(resultLeaderboard, rank - 1);
+
+      // If new #1, launch celebration!
+      if (rank === 1 && getLeaderboard().length > 0) {
+        launchCelebration();
+      }
     }
 
     // --- Start / Restart ---
     function startGame() {
+      stopCelebration();
       score = 0;
       strikes = 0;
       correctCount = 0;
@@ -409,18 +804,32 @@
       poolIndex = 0;
       pool = buildPool();
       scoreDisplay.textContent = "Score: 0";
-      strikesDisplay.textContent = "❌ 0 / 3";
+      strikesDisplay.textContent = "\u274C 0 / 3";
       showScreen(gameScreen);
       nextQuestion();
+    }
+
+    function goToMenu() {
+      stopCelebration();
+      showScreen(startScreen);
+      renderLeaderboard(homeLeaderboard);
     }
 
     // --- Event Listeners ---
     startBtn.addEventListener("click", startGame);
     playAgainBtn.addEventListener("click", startGame);
+    backToMenuBtn.addEventListener("click", goToMenu);
     submitBtn.addEventListener("click", handleSubmit);
     answerInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") handleSubmit();
     });
+    saveScoreBtn.addEventListener("click", handleSaveScore);
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") handleSaveScore();
+    });
+
+    // Show leaderboard on home screen on load
+    renderLeaderboard(homeLeaderboard);
   </script>
 </body>
 </html>
