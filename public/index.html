@@ -441,42 +441,37 @@
     const TIME_LIMIT = 10;
     const MAX_STRIKES = 3;
     const POINTS_PER_CORRECT = 10;
-    const LEADERBOARD_KEY = "flashTablesLeaderboard";
-    const MAX_LEADERBOARD_ENTRIES = 50;
 
     // ===================== LEADERBOARD =====================
-    function getLeaderboard() {
+    let cachedBoard = [];
+
+    async function fetchLeaderboard() {
       try {
-        const data = JSON.parse(localStorage.getItem(LEADERBOARD_KEY));
-        if (Array.isArray(data)) return data;
-      } catch(e) {}
-      return [];
+        const res = await fetch("/api/leaderboard");
+        cachedBoard = await res.json();
+      } catch(e) {
+        cachedBoard = [];
+      }
+      return cachedBoard;
     }
 
-    function saveLeaderboard(board) {
-      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(board));
+    async function addScore(name, points, correct, total) {
+      try {
+        const res = await fetch("/api/leaderboard", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: name.trim(), score: points, correct, total })
+        });
+        const data = await res.json();
+        cachedBoard = data.board;
+        return data.rank;
+      } catch(e) {
+        return -1;
+      }
     }
 
-    function addScore(name, points, correct, total) {
-      const board = getLeaderboard();
-      const entry = {
-        name: name.trim().substring(0, 20),
-        score: points,
-        correct: correct,
-        total: total,
-        date: new Date().toLocaleDateString()
-      };
-      board.push(entry);
-      board.sort((a, b) => b.score - a.score || a.date.localeCompare(b.date));
-      if (board.length > MAX_LEADERBOARD_ENTRIES) board.length = MAX_LEADERBOARD_ENTRIES;
-      saveLeaderboard(board);
-      // Return the rank (1-based index)
-      return board.indexOf(entry) + 1;
-    }
-
-    function renderLeaderboard(container, highlightIndex) {
-      const board = getLeaderboard();
-      if (board.length === 0) {
+    function renderLeaderboardFromData(container, board, highlightIndex) {
+      if (!board || board.length === 0) {
         container.innerHTML = '<div class="leaderboard-section"><h2>&#x1F3C6; Leaderboard</h2><p class="leaderboard-empty">No scores yet. Be the first!</p></div>';
         return;
       }
@@ -499,6 +494,11 @@
       });
       html += '</table></div>';
       container.innerHTML = '<div class="leaderboard-section">' + html + '</div>';
+    }
+
+    async function renderLeaderboard(container, highlightIndex) {
+      const board = await fetchLeaderboard();
+      renderLeaderboardFromData(container, board, highlightIndex);
     }
 
     function escapeHtml(str) {
@@ -769,7 +769,7 @@
     }
 
     // --- Save Score ---
-    function handleSaveScore() {
+    async function handleSaveScore() {
       const name = nameInput.value.trim();
       if (!name) {
         nameInput.style.borderColor = "#e74c3c";
@@ -778,7 +778,7 @@
         return;
       }
 
-      const rank = addScore(name, score, correctCount, totalAnswered);
+      const rank = await addScore(name, score, correctCount, totalAnswered);
 
       // Hide name entry, show leaderboard
       nameEntry.classList.add("hidden");
@@ -786,10 +786,10 @@
       resultButtons.classList.remove("hidden");
       resultButtons.style.display = "flex";
 
-      renderLeaderboard(resultLeaderboard, rank - 1);
+      renderLeaderboardFromData(resultLeaderboard, cachedBoard, rank - 1);
 
       // If new #1, launch celebration!
-      if (rank === 1 && getLeaderboard().length > 0) {
+      if (rank === 1 && cachedBoard.length > 0) {
         launchCelebration();
       }
     }
