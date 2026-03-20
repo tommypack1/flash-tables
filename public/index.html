@@ -16,6 +16,7 @@
       background: linear-gradient(135deg, #2196F3 0%, #1abc9c 100%);
       color: #333;
       transition: background 0.5s ease;
+      overflow: hidden;
     }
     body.division-mode {
       background: linear-gradient(135deg, #27ae60 0%, #f1c40f 100%);
@@ -29,6 +30,10 @@
       max-width: 95vw;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       text-align: center;
+      position: relative;
+      z-index: 10;
+      max-height: 95vh;
+      overflow-y: auto;
     }
 
     h1 {
@@ -178,6 +183,147 @@
       100% { transform: scale(1); }
     }
     .pop { animation: pop 0.3s ease; }
+
+    /* ---------- LEADERBOARD ---------- */
+    .leaderboard {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .leaderboard h2 {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #2196F3;
+      margin-bottom: 12px;
+    }
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .leaderboard-table th {
+      background: #f0f4f8;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .leaderboard-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+    }
+    .leaderboard-table tr:hover td {
+      background: #f9fafb;
+    }
+    .leaderboard-table .rank-col { width: 40px; text-align: center; }
+    .leaderboard-table .score-col { width: 70px; text-align: right; font-weight: 700; color: #1abc9c; }
+    .leaderboard-table .rank-1 td { background: #fffde7; }
+    .leaderboard-table .rank-1 .rank-col::before { content: ""; }
+    .leaderboard-empty {
+      text-align: center;
+      color: #aaa;
+      font-style: italic;
+      padding: 16px;
+    }
+
+    /* ---------- NAME ENTRY ---------- */
+    .name-entry {
+      margin: 20px 0;
+    }
+    #name-input {
+      width: 200px;
+      text-align: center;
+      font-size: 1.2rem;
+      padding: 10px;
+      border: 3px solid #ddd;
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #name-input:focus { border-color: #1abc9c; }
+    #save-score-btn {
+      display: inline-block;
+      margin-left: 8px;
+      background: #1abc9c;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      vertical-align: bottom;
+    }
+    #save-score-btn:hover { background: #16a085; }
+
+    /* ---------- CELEBRATION OVERLAY ---------- */
+    #celebration-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999;
+    }
+    #celebration-canvas {
+      width: 100%;
+      height: 100%;
+    }
+    .new-champ-banner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 20px #ff0, 0 0 40px #f0f, 0 0 60px #0ff, 0 0 80px #f00;
+      text-align: center;
+      pointer-events: none;
+      animation: champPulse 1s ease-in-out infinite alternate;
+      white-space: nowrap;
+    }
+    @keyframes champPulse {
+      0% { transform: translate(-50%, -50%) scale(1); text-shadow: 0 0 20px #ff0, 0 0 40px #f0f, 0 0 60px #0ff; }
+      100% { transform: translate(-50%, -50%) scale(1.15); text-shadow: 0 0 30px #ff0, 0 0 60px #f0f, 0 0 90px #0ff, 0 0 120px #f00; }
+    }
+
+    /* ---------- LASER BEAMS ---------- */
+    .laser-beam {
+      position: fixed;
+      height: 3px;
+      z-index: 998;
+      pointer-events: none;
+      transform-origin: left center;
+      animation: laserPulse 0.3s ease-in-out infinite alternate;
+    }
+    @keyframes laserPulse {
+      0% { opacity: 0.7; height: 2px; }
+      100% { opacity: 1; height: 5px; }
+    }
+
+    /* ---------- CREATURES ---------- */
+    .creature {
+      position: fixed;
+      font-size: 4rem;
+      z-index: 997;
+      pointer-events: none;
+    }
+    @keyframes creatureWalk {
+      0% { transform: translateX(-100px) scaleX(1); }
+      49% { transform: translateX(calc(100vw + 100px)) scaleX(1); }
+      50% { transform: translateX(calc(100vw + 100px)) scaleX(-1); }
+      100% { transform: translateX(-100px) scaleX(-1); }
+    }
+    @keyframes creatureFly {
+      0% { transform: translate(-100px, 0) scaleX(1); }
+      25% { transform: translate(30vw, -80px) scaleX(1); }
+      49% { transform: translate(calc(100vw + 100px), 20px) scaleX(1); }
+      50% { transform: translate(calc(100vw + 100px), 20px) scaleX(-1); }
+      75% { transform: translate(50vw, -60px) scaleX(-1); }
+      100% { transform: translate(-100px, 0) scaleX(-1); }
+    }
   </style>
 </head>
 <body>
@@ -190,6 +336,10 @@
       <p class="subtitle">Multiplication &amp; Division!<br/>How many can you get right?<br/>You have 20 seconds per question.<br/>3 strikes and you're out!</p>
       <br/>
       <button id="start-btn">Start!</button>
+      <div class="leaderboard" id="start-leaderboard">
+        <h2>🏆 Leaderboard</h2>
+        <div id="start-leaderboard-content"></div>
+      </div>
     </div>
 
     <!-- ===== GAME SCREEN ===== -->
@@ -216,9 +366,27 @@
       <div class="final-score" id="final-score">0</div>
       <p class="subtitle">points</p>
       <div class="result-detail" id="result-detail"></div>
+
+      <div class="name-entry" id="name-entry">
+        <p style="margin-bottom: 10px; color: #666; font-weight: 600;">Enter your name for the leaderboard:</p>
+        <input type="text" id="name-input" placeholder="Your name" maxlength="20" />
+        <button id="save-score-btn">Save</button>
+      </div>
+
+      <div class="leaderboard hidden" id="result-leaderboard">
+        <h2>🏆 Leaderboard</h2>
+        <div id="result-leaderboard-content"></div>
+      </div>
+
+      <br/>
       <button id="play-again-btn">Play Again</button>
     </div>
 
+  </div>
+
+  <!-- Celebration overlay -->
+  <div id="celebration-overlay" class="hidden">
+    <canvas id="celebration-canvas"></canvas>
   </div>
 
   <script>
@@ -238,6 +406,11 @@
     const timerBar     = document.getElementById("timer-bar");
     const finalScoreEl = document.getElementById("final-score");
     const resultDetail = document.getElementById("result-detail");
+    const nameInput    = document.getElementById("name-input");
+    const saveScoreBtn = document.getElementById("save-score-btn");
+    const nameEntry    = document.getElementById("name-entry");
+    const celebrationOverlay = document.getElementById("celebration-overlay");
+    const celebrationCanvas  = document.getElementById("celebration-canvas");
 
     // --- Game State ---
     let score = 0;
@@ -246,32 +419,67 @@
     let totalAnswered = 0;
     let currentA = 0;
     let currentB = 0;
-    let currentOp = "×"; // "×" or "÷"
+    let currentOp = "×";
     let currentAnswer = 0;
     let timerInterval = null;
     let timeLeft = 20;
+    let celebrationAnimId = null;
 
     const TIME_LIMIT = 20;
     const MAX_STRIKES = 3;
     const POINTS_PER_CORRECT = 10;
 
-    // --- Build question pool (multiplication + division) ---
+    // --- Leaderboard ---
+    async function fetchLeaderboard() {
+      try {
+        const res = await fetch("/api/leaderboard");
+        return await res.json();
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function renderLeaderboard(data, containerId) {
+      const container = document.getElementById(containerId);
+      if (!data || data.length === 0) {
+        container.innerHTML = '<p class="leaderboard-empty">No scores yet. Be the first!</p>';
+        return;
+      }
+      let html = '<table class="leaderboard-table"><thead><tr><th class="rank-col">#</th><th>Name</th><th class="score-col">Score</th></tr></thead><tbody>';
+      data.slice(0, 10).forEach((entry, i) => {
+        const rankClass = i === 0 ? 'rank-1' : '';
+        const medal = i === 0 ? '👑 ' : i === 1 ? '🥈 ' : i === 2 ? '🥉 ' : '';
+        html += '<tr class="' + rankClass + '"><td class="rank-col">' + (i + 1) + '</td><td>' + medal + escapeHtml(entry.name) + '</td><td class="score-col">' + entry.score + '</td></tr>';
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    async function loadStartLeaderboard() {
+      const data = await fetchLeaderboard();
+      renderLeaderboard(data, 'start-leaderboard-content');
+    }
+
+    // --- Build question pool ---
     function buildPool() {
       const pool = [];
-      // Multiplication: 1×1 through 12×12
       for (let a = 1; a <= 12; a++) {
         for (let b = 1; b <= 12; b++) {
-          pool.push({ a: a, b: b, op: "×", answer: a * b });
+          pool.push({ a, b, op: "×", answer: a * b });
         }
       }
-      // Division: only whole-number results, dividend 1-12, divisor 1-12
       for (let divisor = 1; divisor <= 12; divisor++) {
         for (let quotient = 1; quotient <= 12; quotient++) {
           const dividend = divisor * quotient;
           pool.push({ a: dividend, b: divisor, op: "÷", answer: quotient });
         }
       }
-      // Shuffle
       for (let i = pool.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -318,7 +526,6 @@
     // --- Next Question ---
     function nextQuestion() {
       if (poolIndex >= pool.length) {
-        // Reshuffle if we go through all problems
         pool = buildPool();
         poolIndex = 0;
       }
@@ -328,7 +535,6 @@
       currentOp = problem.op;
       currentAnswer = problem.answer;
       questionEl.textContent = currentA + " " + currentOp + " " + currentB;
-      // Switch background for division problems
       if (currentOp === "÷") {
         document.body.classList.add("division-mode");
       } else {
@@ -398,6 +604,51 @@
       else if (correctCount >= 5)  msg += "\n💪 Nice effort! Practice makes perfect!";
       else                         msg += "\n👍 Good try! You'll do even better next time!";
       resultDetail.textContent = msg;
+
+      // Show name entry, hide leaderboard until saved
+      nameEntry.classList.remove("hidden");
+      document.getElementById("result-leaderboard").classList.add("hidden");
+      nameInput.value = localStorage.getItem("flashTablesName") || "";
+      nameInput.focus();
+    }
+
+    // --- Save Score ---
+    saveScoreBtn.addEventListener("click", saveScore);
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") saveScore();
+    });
+
+    async function saveScore() {
+      const name = nameInput.value.trim();
+      if (!name) { nameInput.focus(); return; }
+      localStorage.setItem("flashTablesName", name);
+      saveScoreBtn.disabled = true;
+      saveScoreBtn.textContent = "Saving...";
+
+      try {
+        const res = await fetch("/api/leaderboard", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, score })
+        });
+        const result = await res.json();
+
+        nameEntry.classList.add("hidden");
+        const data = await fetchLeaderboard();
+        const lbDiv = document.getElementById("result-leaderboard");
+        lbDiv.classList.remove("hidden");
+        renderLeaderboard(data, "result-leaderboard-content");
+
+        // If new #1 score, trigger the celebration!
+        if (result.isNewTopScore && score > 0) {
+          startCelebration();
+        }
+      } catch (e) {
+        console.error("Failed to save score:", e);
+      }
+
+      saveScoreBtn.disabled = false;
+      saveScoreBtn.textContent = "Save";
     }
 
     // --- Start / Restart ---
@@ -410,17 +661,223 @@
       pool = buildPool();
       scoreDisplay.textContent = "Score: 0";
       strikesDisplay.textContent = "❌ 0 / 3";
+      stopCelebration();
       showScreen(gameScreen);
       nextQuestion();
     }
 
     // --- Event Listeners ---
     startBtn.addEventListener("click", startGame);
-    playAgainBtn.addEventListener("click", startGame);
+    playAgainBtn.addEventListener("click", () => {
+      stopCelebration();
+      startGame();
+    });
     submitBtn.addEventListener("click", handleSubmit);
     answerInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") handleSubmit();
     });
+
+    // Load leaderboard on start
+    loadStartLeaderboard();
+
+    // =============================================
+    // CELEBRATION: Fireworks + Lasers + Dinosaurs + Dragons
+    // =============================================
+    let fireworks = [];
+    let particles = [];
+    let lasers = [];
+    let creatures = [];
+    let celebrationStart = 0;
+    const CELEBRATION_DURATION = 12000;
+
+    function startCelebration() {
+      celebrationOverlay.classList.remove("hidden");
+      const canvas = celebrationCanvas;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      fireworks = [];
+      particles = [];
+      lasers = [];
+      creatures = [];
+      celebrationStart = Date.now();
+
+      // Add banner
+      let banner = document.querySelector(".new-champ-banner");
+      if (!banner) {
+        banner = document.createElement("div");
+        banner.className = "new-champ-banner";
+        document.body.appendChild(banner);
+      }
+      banner.textContent = "👑 NEW #1 CHAMPION! 👑";
+      banner.style.display = "block";
+
+      // Spawn creatures (dinosaurs & dragons)
+      spawnCreatures();
+
+      // Start laser beams
+      spawnLasers();
+
+      celebrationAnimId = requestAnimationFrame(animateCelebration);
+    }
+
+    function stopCelebration() {
+      if (celebrationAnimId) {
+        cancelAnimationFrame(celebrationAnimId);
+        celebrationAnimId = null;
+      }
+      celebrationOverlay.classList.add("hidden");
+      const banner = document.querySelector(".new-champ-banner");
+      if (banner) banner.style.display = "none";
+
+      // Remove creatures
+      document.querySelectorAll(".creature").forEach(el => el.remove());
+      document.querySelectorAll(".laser-beam").forEach(el => el.remove());
+    }
+
+    function spawnCreatures() {
+      const creaturesData = [
+        { emoji: "🦕", y: "75%", duration: "6s", anim: "creatureWalk" },
+        { emoji: "🦖", y: "80%", duration: "5s", anim: "creatureWalk" },
+        { emoji: "🐉", y: "20%", duration: "7s", anim: "creatureFly" },
+        { emoji: "🐲", y: "30%", duration: "4.5s", anim: "creatureFly" },
+        { emoji: "🦕", y: "85%", duration: "8s", anim: "creatureWalk" },
+        { emoji: "🐉", y: "15%", duration: "5.5s", anim: "creatureFly" },
+      ];
+      creaturesData.forEach((c, i) => {
+        const el = document.createElement("div");
+        el.className = "creature";
+        el.textContent = c.emoji;
+        el.style.top = c.y;
+        el.style.left = "-100px";
+        el.style.animation = c.anim + " " + c.duration + " linear " + (i * 0.7) + "s infinite";
+        document.body.appendChild(el);
+      });
+    }
+
+    function spawnLasers() {
+      const colors = [
+        "linear-gradient(90deg, #ff0000, #ff000000)",
+        "linear-gradient(90deg, #00ff00, #00ff0000)",
+        "linear-gradient(90deg, #0088ff, #0088ff00)",
+        "linear-gradient(90deg, #ff00ff, #ff00ff00)",
+        "linear-gradient(90deg, #ffff00, #ffff0000)",
+        "linear-gradient(90deg, #00ffff, #00ffff00)",
+      ];
+      for (let i = 0; i < 8; i++) {
+        const el = document.createElement("div");
+        el.className = "laser-beam";
+        const angle = (Math.random() - 0.5) * 60;
+        const yPos = 10 + Math.random() * 80;
+        el.style.top = yPos + "%";
+        el.style.left = "0";
+        el.style.width = "100vw";
+        el.style.transform = "rotate(" + angle + "deg)";
+        el.style.background = colors[i % colors.length];
+        el.style.boxShadow = "0 0 10px " + (i % 2 === 0 ? "#ff0" : "#0ff") + ", 0 0 20px " + (i % 2 === 0 ? "#f0f" : "#0f0");
+        el.style.animationDelay = (i * 0.15) + "s";
+        document.body.appendChild(el);
+      }
+    }
+
+    function animateCelebration(timestamp) {
+      const canvas = celebrationCanvas;
+      const ctx = canvas.getContext("2d");
+      const elapsed = Date.now() - celebrationStart;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Launch fireworks periodically
+      if (Math.random() < 0.08) {
+        launchFirework(canvas);
+      }
+
+      // Update & draw particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.05; // gravity
+        p.life -= 0.015;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Sparkle trail
+        if (Math.random() < 0.3) {
+          ctx.fillStyle = "#fff";
+          ctx.globalAlpha = p.life * 0.5;
+          ctx.beginPath();
+          ctx.arc(p.x + (Math.random()-0.5)*4, p.y + (Math.random()-0.5)*4, p.size * 0.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1;
+
+      // Update & draw firework trails
+      for (let i = fireworks.length - 1; i >= 0; i--) {
+        const fw = fireworks[i];
+        fw.x += fw.vx;
+        fw.y += fw.vy;
+        fw.vy += 0.03;
+        fw.life -= 0.02;
+
+        // Draw trail
+        ctx.fillStyle = fw.color;
+        ctx.globalAlpha = fw.life;
+        ctx.beginPath();
+        ctx.arc(fw.x, fw.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (fw.life <= 0 || fw.vy >= 0) {
+          // Explode!
+          explodeFirework(fw.x, fw.y);
+          fireworks.splice(i, 1);
+        }
+      }
+      ctx.globalAlpha = 1;
+
+      if (elapsed < CELEBRATION_DURATION) {
+        celebrationAnimId = requestAnimationFrame(animateCelebration);
+      } else {
+        stopCelebration();
+      }
+    }
+
+    function launchFirework(canvas) {
+      const colors = ["#ff3366", "#33ccff", "#ffcc00", "#66ff66", "#ff66ff", "#ff8800", "#00ffcc"];
+      fireworks.push({
+        x: Math.random() * canvas.width,
+        y: canvas.height,
+        vx: (Math.random() - 0.5) * 3,
+        vy: -(8 + Math.random() * 6),
+        life: 1,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
+
+    function explodeFirework(x, y) {
+      const colors = ["#ff3366", "#33ccff", "#ffcc00", "#66ff66", "#ff66ff", "#ff8800", "#00ffcc", "#fff", "#ff0"];
+      const count = 40 + Math.floor(Math.random() * 30);
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.3;
+        const speed = 2 + Math.random() * 4;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 0.7 + Math.random() * 0.3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: 2 + Math.random() * 3
+        });
+      }
+    }
   </script>
 </body>
 </html>
